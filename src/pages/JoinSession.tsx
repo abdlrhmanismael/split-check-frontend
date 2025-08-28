@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { getSessionSummary, joinSession } from "@/lib/api";
-import { formatCurrency, calculateProductTotal } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import {
   ArrowLeft,
   Plus,

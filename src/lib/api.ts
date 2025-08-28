@@ -1,8 +1,5 @@
 import axios from "axios";
 import type {
-  Session,
-  SessionResponse,
-  SessionSummary,
   SessionSummaryResponse,
   CreateSessionRequest,
   CreateSessionResponse,
