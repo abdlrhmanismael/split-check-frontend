@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 45 100% 51%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 45 100% 51%;
+    --chart-1: 45 100% 51%;
+    --chart-2: 217.2 32.6% 17.5%;
+    --chart-3: 210 40% 98%;
+    --chart-4: 45 100% 51%;
+    --chart-5: 217.2 32.6% 17.5%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl;
+  }
+
+  .luxury-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 215, 0, 0.1) 0%,
+      rgba(255, 215, 0, 0.05) 100%
+    );
+  }
+
+  .luxury-border {
+    @apply border border-yellow-500/20;
+  }
+
+  .luxury-shadow {
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+  }
+
+  .luxury-text-gradient {
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
