@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Plus, Sparkles } from "lucide-react";
 
@@ -80,6 +79,7 @@ const Landing = () => {
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
+            onClick={() => navigate("/create")}
           >
             <Card className="glassmorphism luxury-border hover:bg-white/5 transition-all duration-300 cursor-pointer group">
               <CardContent className="p-8">
@@ -94,14 +94,9 @@ const Landing = () => {
                     Start a new bill splitting session and invite your friends
                     to join
                   </p>
-                  <Button
-                    variant="luxury"
-                    size="xl"
-                    className="w-full mt-4"
-                    onClick={() => navigate("/create")}
-                  >
-                    Get Started
-                  </Button>
+                  <div className="text-yellow-500 font-semibold mt-4 group-hover:text-yellow-400 transition-colors">
+                    Get Started →
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -111,6 +106,7 @@ const Landing = () => {
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
+            onClick={() => navigate("/join")}
           >
             <Card className="glassmorphism luxury-border hover:bg-white/5 transition-all duration-300 cursor-pointer group">
               <CardContent className="p-8">
@@ -124,14 +120,9 @@ const Landing = () => {
                   <p className="text-gray-400 text-center">
                     Join an existing session and add your orders to the bill
                   </p>
-                  <Button
-                    variant="glass"
-                    size="xl"
-                    className="w-full mt-4"
-                    onClick={() => navigate("/join")}
-                  >
-                    Join Now
-                  </Button>
+                  <div className="text-blue-500 font-semibold mt-4 group-hover:text-blue-400 transition-colors">
+                    Join Now →
+                  </div>
                 </div>
               </CardContent>
             </Card>
