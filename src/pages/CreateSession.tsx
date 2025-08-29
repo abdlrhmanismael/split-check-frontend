@@ -56,6 +56,16 @@ const CreateSession = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.numberOfFriends || formData.numberOfFriends < 1) {
+      toast({
+        title: "Error",
+        description: "Please enter the number of friends",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -248,11 +258,15 @@ const CreateSession = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="numberOfFriends">Number of Friends</Label>
+                    <Label htmlFor="numberOfFriends">
+                      Number of Friends *
+                      <span className="text-red-500 ml-1">*</span>
+                    </Label>
                     <Input
                       id="numberOfFriends"
                       type="number"
                       min="1"
+                      required
                       value={formData.numberOfFriends || ""}
                       onChange={(e) =>
                         handleInputChange(
@@ -260,7 +274,7 @@ const CreateSession = () => {
                           parseInt(e.target.value) || undefined
                         )
                       }
-                      placeholder="Optional"
+                      placeholder="Enter number of friends"
                     />
                   </div>
 

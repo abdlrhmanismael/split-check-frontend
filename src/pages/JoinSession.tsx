@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { getSessionSummary, joinSession } from "@/lib/api";
+import { getSessionId, joinSession } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -32,6 +32,29 @@ const JoinSession = () => {
     { productName: "", unitPrice: 0, quantity: 1 },
   ]);
 
+  // Calculate subtotal from products
+  const calculateSubtotal = () => {
+    return products.reduce((sum, product) => {
+      return sum + product.unitPrice * product.quantity;
+    }, 0);
+  };
+
+  // Calculate total including all fees
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = session?.taxPercentage
+      ? subtotal * (session.taxPercentage / 100)
+      : 0;
+    const service = session?.servicePercentage
+      ? subtotal * (session.servicePercentage / 100)
+      : 0;
+    const delivery = session?.deliveryFee && session?.numberOfFriends
+      ? session.deliveryFee / session.numberOfFriends
+      : 0;
+
+    return subtotal + tax + service + delivery;
+  };
+
   useEffect(() => {
     if (sessionId) {
       loadSession();
@@ -40,14 +63,18 @@ const JoinSession = () => {
 
   const loadSession = async () => {
     try {
-      const response = await getSessionSummary(sessionId!);
-      // Create a session object from the summary data
+      const response = await getSessionId(sessionId!);
       const sessionData: Session = {
-        sessionId: response.summary.sessionId,
-        totalOrderAmount: response.summary.totalOrderAmount,
-        billImage: response.summary.billImage,
-        createdAt: new Date().toISOString(), // We don't have this in summary
-        friends: response.summary.friends,
+        sessionId: response.session.sessionId,
+        totalOrderAmount: response.session.totalOrderAmount,
+        billImage: response.session.billImage,
+        taxPercentage: response.session.taxPercentage,
+        servicePercentage: response.session.servicePercentage,
+        deliveryFee: response.session.deliveryFee,
+        instaPayURL: response.session.instaPayURL,
+        createdAt: response.session.createdAt,
+        friends: response.session.friends,
+        numberOfFriends: response.session.numberOfFriends,
       };
       setSession(sessionData);
     } catch (error) {
@@ -83,8 +110,6 @@ const JoinSession = () => {
     };
     setProducts(updatedProducts);
   };
-
-  // Removed calculateTotal function as backend handles all calculations including taxes, services, and delivery
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -263,12 +288,26 @@ const JoinSession = () => {
                       </span>
                     </div>
                   )}
-                  {session.deliveryFee && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Delivery Fee:</span>
-                      <span className="text-gray-300">
-                        {formatCurrency(session.deliveryFee)}
-                      </span>
+                  {session.deliveryFee && session.deliveryFee > 0 && (
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Delivery Fee:</span>
+                        <span className="text-gray-300">
+                          {formatCurrency(
+                            session.deliveryFee /
+                              (session.friends?.length
+                                ? session.friends.length + 1
+                                : 1)
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-right text-xs text-gray-500">
+                        (Total: {formatCurrency(session.deliveryFee)} ÷{" "}
+                        {session.friends?.length
+                          ? session.friends.length + 1
+                          : 1}{" "}
+                        friends)
+                      </div>
                     </div>
                   )}
                   {session.instaPayURL && (
@@ -320,9 +359,26 @@ const JoinSession = () => {
                         <CreditCard className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-400">
-                      {paymentMethod ? "InstaPay" : "Cash"} Payment
-                    </p>
+                    <span className="text-sm font-medium leading-none">
+                      {paymentMethod ? "InstaPay" : "Cash"}
+                    </span>
+                    {paymentMethod && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="ml-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0"
+                        onClick={() =>
+                          window.open(
+                            session.instaPayURL ||
+                              "https://ipn.eg/S/abdlrhmanismaelnbe/instapay/2oCjtW",
+                            "_blank"
+                          )
+                        }
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Pay with InstaPay
+                      </Button>
+                    )}
                   </div>
 
                   <div className="space-y-4">
@@ -416,11 +472,67 @@ const JoinSession = () => {
                     </AnimatePresence>
 
                     <div className="pt-4 border-t border-gray-700">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-400">
-                          Final total will be calculated by the server including
-                          taxes, services, and delivery fees
-                        </p>
+                      <div className="space-y-2 pt-4 border-t border-gray-700">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Subtotal:</span>
+                          <span className="text-gray-300">
+                            {formatCurrency(calculateSubtotal())}
+                          </span>
+                        </div>
+                        {session?.taxPercentage &&
+                          session.taxPercentage > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">
+                                Tax ({session.taxPercentage}%):
+                              </span>
+                              <span className="text-gray-300">
+                                {formatCurrency(
+                                  calculateSubtotal() *
+                                    (session.taxPercentage / 100)
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        {session?.servicePercentage &&
+                          session.servicePercentage > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">
+                                Service ({session.servicePercentage}%):
+                              </span>
+                              <span className="text-gray-300">
+                                {formatCurrency(
+                                  calculateSubtotal() *
+                                    (session.servicePercentage / 100)
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        {session?.deliveryFee && session.deliveryFee > 0 && (
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-gray-400">
+                                Delivery Fee:
+                              </span>
+                              <span className="text-gray-300">
+                                {formatCurrency(
+                                  session.deliveryFee / (session.numberOfFriends || 1)
+                                )}
+                              </span>
+                            </div>
+                            <div className="text-right text-xs text-gray-500">
+                              (Total: {formatCurrency(session.deliveryFee)} ÷{" "}
+                              {session.numberOfFriends || 1} friends)
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex justify-between pt-2 border-t border-gray-700">
+                          <span className="font-semibold text-white">
+                            Total:
+                          </span>
+                          <span className="font-bold text-white">
+                            {formatCurrency(calculateTotal())}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>

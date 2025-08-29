@@ -84,3 +84,19 @@ export interface JoinSessionRequest {
 export interface UpdatePaymentRequest {
   hasPaid: boolean;
 }
+export interface SessionDetails {
+  session: Session;
+}
+
+export interface SessionId {
+  sessionId: string;
+  totalOrderAmount: number;
+  taxPercentage: number;
+  servicePercentage: number;
+  deliveryFee: number;
+  numberOfFriends: number;
+  instaPayURL: string;
+  billImage: string;
+  friends: any[];
+  createdAt: Date;
+}

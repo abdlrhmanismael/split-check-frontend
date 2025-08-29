@@ -6,6 +6,7 @@ import type {
   JoinSessionRequest,
   JoinSessionResponse,
   UpdatePaymentRequest,
+  SessionDetails,
 } from "../types";
 
 const API_BASE_URL =
@@ -50,6 +51,12 @@ export const getSessionSummary = async (
   sessionId: string
 ): Promise<SessionSummaryResponse> => {
   const response = await api.get(`/sessions/${sessionId}/summary`);
+  return response.data;
+};
+export const getSessionId = async (
+  sessionId: string
+): Promise<SessionDetails> => {
+  const response = await api.get(`/sessions/${sessionId}`);
   return response.data;
 };
 
